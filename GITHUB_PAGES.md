@@ -8,10 +8,10 @@ serves it over HTTPS, which Web Bluetooth requires.
 
 This repo ships `.github/workflows/deploy.yml`, which builds `frontend/` and publishes it.
 
-1. Push this repository to GitHub.
+1. Push this repository to GitHub (**LocalFrost101/project-hhs**).
 2. In the repo: **Settings → Pages → Source → GitHub Actions**.
 3. Push any commit to `main` (or run the workflow manually from the Actions tab).
-4. Your site appears at `https://<username>.github.io/<repo>/`.
+4. Your site appears at **https://localfrost101.github.io/project-hhs/** — watch the Actions tab for the green checkmark on the first run.
 
 The Vite config uses `base: "./"`, so it works under any repo subpath with no extra config.
 
