@@ -8,6 +8,9 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel
 
+from lib.db import db
+from lib.ownerlog import log_event
+
 router = APIRouter()
 
 WEBHOOK_RE = re.compile(r"^https://(?:(?:canary|ptb)\.)?discord(?:app)?\.com/api/webhooks/\d+/[\w-]+/?$")
@@ -45,8 +48,10 @@ async def protect(req: ProtectRequest, request: Request):
     nonce = os.urandom(12)
     ciphertext = AESGCM(_key()).encrypt(nonce, url.encode(), None)
     token = _b64url_encode(nonce + ciphertext)
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
     proto = request.headers.get("x-forwarded-proto", request.url.scheme)
     host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
+    await log_event("webhook_protected", f"New proxy issued · token `{token[:10]}…`", token_hash)
     return ProtectResponse(token=token, proxy_url=f"{proto}://{host}/api/hook/{token}")
 
 
@@ -59,11 +64,15 @@ async def hook(token: str, request: Request):
         raise HTTPException(status_code=400, detail="Invalid or corrupted token")
     if not WEBHOOK_RE.match(url):
         raise HTTPException(status_code=400, detail="Invalid token payload")
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    if await db.revoked_tokens.find_one({"token_hash": token_hash}):
+        raise HTTPException(status_code=403, detail="Token revoked by owner")
     if request.url.query:
         url = f"{url}?{request.url.query}"
     body = await request.body()
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(url, content=body, headers={"Content-Type": "application/json"})
+    await log_event("hook_relay", f"Token `{token[:10]}…` → Discord {resp.status_code}", token_hash)
     return Response(
         content=resp.content or b"{}",
         status_code=resp.status_code,

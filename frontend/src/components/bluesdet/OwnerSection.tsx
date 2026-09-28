@@ -14,12 +14,20 @@ interface LogEntry {
   event: string;
   detail: string;
   timestamp: string;
+  token_hash?: string;
 }
 
 interface LogsResponse {
   logs: LogEntry[];
   notify: boolean;
   note?: string;
+}
+
+interface ArchivedScript {
+  id: string;
+  source: string;
+  size: number;
+  created_at?: string | null;
 }
 
 const PANEL = "scanlines overflow-hidden rounded-md border border-amber-400/20 bg-[#0b0906]";
@@ -40,6 +48,9 @@ export function OwnerSection() {
   const [note, setNote] = useState<string | null>(null);
   const [logsError, setLogsError] = useState<string | null>(null);
 
+  const [scripts, setScripts] = useState<ArchivedScript[] | null>(null);
+  const [revoked, setRevoked] = useState<Set<string>>(new Set());
+
   const [deobIn, setDeobIn] = useState("");
   const [deobOut, setDeobOut] = useState<string | null>(null);
   const [deobError, setDeobError] = useState<string | null>(null);
@@ -59,6 +70,41 @@ export function OwnerSection() {
     }
   };
 
+  const fetchScripts = async (t: string) => {
+    try {
+      const res = await fetch("/api/scripts", { headers: { Authorization: `Bearer ${t}` } });
+      if (res.ok) {
+        const data = (await res.json()) as { scripts: ArchivedScript[] };
+        setScripts(data.scripts);
+      }
+    } catch {
+      /* archive is optional */
+    }
+  };
+
+  const revokeToken = async (hash: string) => {
+    if (!token) return;
+    try {
+      const res = await fetch("/api/owner/revoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ token_hash: hash }),
+      });
+      if (res.ok) setRevoked((prev) => new Set(prev).add(hash));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const downloadScript = (s: ArchivedScript) => {
+    const blob = new Blob([s.source], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `bluesdet-${s.id.slice(0, 8)}.lua`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
   const unlock = async () => {
     setBusy(true);
     setError(null);
@@ -67,6 +113,7 @@ export function OwnerSection() {
       setToken(res.token);
       setCode("");
       await fetchLogs(res.token);
+      await fetchScripts(res.token);
     } catch (err) {
       const detail = (err as { body?: { detail?: string } })?.body?.detail;
       setError(
@@ -284,9 +331,66 @@ export function OwnerSection() {
                             {log.event}
                           </p>
                           <p className="mt-0.5 font-mono text-[10px] leading-relaxed text-slate-400">{log.detail}</p>
-                          <p className="mt-1 font-mono text-[9px] text-slate-600">
-                            {log.timestamp.replace("T", " ").slice(0, 19)} UTC
-                          </p>
+                          <div className="mt-1 flex items-center justify-between gap-2">
+                            <p className="font-mono text-[9px] text-slate-600">
+                              {log.timestamp.replace("T", " ").slice(0, 19)} UTC
+                            </p>
+                            {log.token_hash && (
+                              <button
+                                data-testid={`revoke-button-${i}`}
+                                onClick={() => revokeToken(log.token_hash!)}
+                                disabled={revoked.has(log.token_hash)}
+                                className="rounded-sm border border-red-400/30 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-red-300 transition-colors hover:bg-red-400/10 disabled:border-slate-700 disabled:text-slate-600"
+                              >
+                                {revoked.has(log.token_hash) ? "Revoked" : "Revoke token"}
+                              </button>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              <div className={`${PANEL} lg:col-span-2`} data-testid="owner-scripts-panel">
+                <div className="flex items-center justify-between border-b border-amber-400/15 px-5 py-4">
+                  <h3 className="font-heading text-sm font-black uppercase tracking-[0.2em] text-slate-100">
+                    Script archive
+                  </h3>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-500">
+                    30-day auto-delete
+                  </span>
+                </div>
+                <div className="px-5 py-5">
+                  {scripts === null || scripts.length === 0 ? (
+                    <p className="font-mono text-[11px] leading-relaxed text-slate-500">
+                      No archived sources yet. Every obfuscate submission lands here — on Vercel
+                      this panel needs KV storage connected.
+                    </p>
+                  ) : (
+                    <ul data-testid="owner-scripts-list" className="max-h-72 space-y-2 overflow-y-auto">
+                      {scripts.map((s, i) => (
+                        <li
+                          key={s.id}
+                          data-testid={`script-row-${i}`}
+                          className="flex items-center justify-between gap-3 rounded-sm border border-amber-400/10 bg-amber-400/5 px-3 py-2.5"
+                        >
+                          <div>
+                            <p className="font-mono text-[11px] font-bold text-amber-200">
+                              bluesdet-{s.id.slice(0, 8)}.lua
+                            </p>
+                            <p className="mt-0.5 font-mono text-[9px] text-slate-500">
+                              {s.size} bytes{s.created_at ? ` · ${s.created_at.slice(0, 10)}` : ""}
+                            </p>
+                          </div>
+                          <button
+                            data-testid={`script-download-${i}`}
+                            onClick={() => downloadScript(s)}
+                            className="rounded-sm border border-amber-400/30 px-3 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-amber-300 transition-colors hover:bg-amber-400/10"
+                          >
+                            Download .lua
+                          </button>
                         </li>
                       ))}
                     </ul>

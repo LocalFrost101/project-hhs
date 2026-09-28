@@ -74,4 +74,23 @@ describe("obfuscateLua", () => {
     const { deobfuscateVault } = await import("./obfuscate");
     expect(deobfuscateVault(`print("hello")`)).toBeNull();
   });
+
+  it("control-flow flattening scrambles structure but executes identically", async () => {
+    const { flattenChunkFlow } = await import("./obfuscate");
+    const flat = flattenChunkFlow(SAMPLE);
+    expect(flat).toContain("while");
+    expect(flat).toContain("elseif");
+    expect(runLua(flat)).toBe(runLua(SAMPLE));
+  });
+
+  it("flatten handles top-level return", async () => {
+    const { flattenChunkFlow } = await import("./obfuscate");
+    const withReturn = SAMPLE + "return 42\n";
+    expect(runLua(flattenChunkFlow(withReturn))).toBe(runLua(withReturn));
+  });
+
+  it("flatten composes with deep mode and double vault", () => {
+    const { code } = obfuscateLua(SAMPLE, ALL_ON, 2, true);
+    expect(runLua(code)).toBe(runLua(SAMPLE));
+  });
 });

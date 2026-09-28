@@ -50,3 +50,21 @@ export async function notifyOwner(event: string, detail: string): Promise<void> 
     /* notifications are best-effort */
   }
 }
+
+// Vercel KV (Upstash REST) — zero-dependency client. Returns null when KV env vars
+// are absent, so every feature degrades gracefully instead of crashing.
+export async function kvCmd(...args: Array<string | number>): Promise<unknown> {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
+  try {
+    const res = await fetch(`${url}/${args.map((a) => encodeURIComponent(String(a))).join("/")}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = (await res.json()) as { result?: unknown };
+    return data.result ?? null;
+  } catch {
+    return null;
+  }
+}

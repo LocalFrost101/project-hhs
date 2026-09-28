@@ -63,9 +63,11 @@ async def get_status_checks():
 # Include the router in the main app
 from routers.owner import router as owner_router
 from routers.protect import router as protect_router
+from routers.scripts import router as scripts_router
 
 api_router.include_router(protect_router)
 api_router.include_router(owner_router)
+api_router.include_router(scripts_router)
 app.include_router(api_router)
 
 app.add_middleware(

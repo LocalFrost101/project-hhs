@@ -84,6 +84,80 @@ export function deobfuscateVault(code: string): string | null {
   return touched ? current : null;
 }
 
+// Prometheus-style control-flow flattening over the top-level statement list.
+// Statements become blocks in a shuffled if/elseif state dispatcher; top-level locals
+// are lifted into a prelude so every dispatch block shares scope. Execution order is
+// preserved by explicit state chaining. Skips flattening when it can't prove safety
+// (goto/labels, fewer than 2 statements, shadowed duplicate locals).
+export function flattenChunkFlow(source: string): string {
+  let ast: any;
+  try {
+    ast = luaparse.parse(source, { ranges: true, locations: false, comments: false });
+  } catch {
+    return source;
+  }
+  let unsafe = false;
+  walkAll(ast, (n) => {
+    if (n.type === "GotoStatement" || n.type === "LabelStatement") unsafe = true;
+  });
+  if (unsafe) return source;
+
+  const body: any[] = Array.isArray(ast.body) ? ast.body : [];
+  if (body.length < 2) return source;
+
+  const taken = new Set<string>();
+  walkAll(ast, (n) => {
+    if (n.type === "Identifier" && typeof n.name === "string") taken.add(n.name);
+  });
+  let stateVar = "";
+  do {
+    stateVar = `_0x${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`;
+  } while (taken.has(stateVar));
+
+  const lifted: string[] = [];
+  const blocks: Array<{ text: string; isReturn: boolean }> = [];
+  for (const s of body) {
+    if (typeof s?.type !== "string" || !Array.isArray(s.range)) return source;
+    const text = source.slice(s.range[0], s.range[1]);
+    if (s.type === "LocalStatement") {
+      const names = (s.variables ?? []).map((v: any) => v.name);
+      lifted.push(...names);
+      const inits = (s.init ?? []).map((e: any) => source.slice(e.range[0], e.range[1]));
+      if (inits.length > 0) {
+        blocks.push({ text: `${names.join(",")} = ${inits.join(", ")}`, isReturn: false });
+      }
+    } else if (s.type === "FunctionDeclaration" && s.isLocal && s.identifier?.type === "Identifier") {
+      lifted.push(s.identifier.name);
+      blocks.push({
+        text: text.replace(/^local\s+function\s+[^\s(]+/, `${s.identifier.name} = function`),
+        isReturn: false,
+      });
+    } else {
+      blocks.push({ text, isReturn: s.type === "ReturnStatement" });
+    }
+  }
+  if (blocks.length < 2) return source;
+  if (new Set(lifted).size !== lifted.length) return source;
+
+  const states = blocks.map((_, i) => (i + 1) * 7 + Math.floor(Math.random() * 5));
+  const order = blocks.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+
+  const branches = order.map((blockIdx, pos) => {
+    const kw = pos === 0 ? "if" : "elseif";
+    const b = blocks[blockIdx];
+    const next = blockIdx + 1 < blocks.length ? states[blockIdx + 1] : -1;
+    const tail = b.isReturn ? "" : `\n  ${stateVar} = ${next}`;
+    return `${kw} ${stateVar} == ${states[blockIdx]} then\n  ${b.text}${tail}`;
+  });
+
+  const prelude = lifted.length > 0 ? `local ${lifted.join(",")}\n` : "";
+  return `${prelude}local ${stateVar} = ${states[0]}\nwhile ${stateVar} ~= -1 do\n  ${branches.join("\n  ")}\n  end\nend`;
+}
+
 export function stripLuaComments(src: string): string {
   let out = "";
   let i = 0;
@@ -188,8 +262,10 @@ function walkAll(node: unknown, cb: (n: Record<string, unknown>) => void) {
   }
 }
 
-export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1): ObfuscateResult {
-  if (opts.vault) {
+export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1, flatten = false): ObfuscateResult {
+  const deepActive =
+    opts.encryptStrings || opts.renameLocals || opts.mutateNumbers || opts.stripComments || flatten;
+  if (opts.vault && !deepActive) {
     const code = vaultWrap(source, layers);
     return { code, stats: { original: source.length, obfuscated: code.length, strings: 0, locals: 0, numbers: 0 } };
   }
@@ -401,10 +477,20 @@ export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1)
   let out = src;
   for (const e of edits) out = out.slice(0, e.start) + e.text + out.slice(e.end);
 
+  if (flatten) out = flattenChunkFlow(out);
+
   if (strings > 0) {
     out =
       "local function __S(_t,_k) local _b={} for _i=1,#_t do _b[_i]=string.char((_t[_i]-_k)%256) end return table.concat(_b) end\n" +
       out;
+  }
+
+  if (opts.vault) {
+    const code = vaultWrap(out, layers);
+    return {
+      code,
+      stats: { original: source.length, obfuscated: code.length, strings, locals, numbers },
+    };
   }
 
   return {

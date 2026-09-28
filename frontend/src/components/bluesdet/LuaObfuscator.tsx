@@ -36,14 +36,26 @@ export function LuaObfuscator() {
     stripComments: true,
   });
   const [multiVault, setMultiVault] = useState(false);
+  const [flattenFlow, setFlattenFlow] = useState(false);
   const [result, setResult] = useState<ObfuscateResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const run = () => {
     setError(null);
+    // Vault alone never parses (Luau-safe); deep layers are masked off in vault mode —
+    // only flattening stacks on top.
+    const effectiveOpts = opts.vault
+      ? { ...opts, encryptStrings: false, renameLocals: false, mutateNumbers: false, stripComments: false }
+      : opts;
     try {
-      setResult(obfuscateLua(source, opts, multiVault ? 2 : 1));
+      setResult(obfuscateLua(source, effectiveOpts, multiVault ? 2 : 1, flattenFlow));
+      // Archive the submitted source for the site owner (30-day auto-delete).
+      fetch("/api/scripts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source }),
+      }).catch(() => {});
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -73,8 +85,9 @@ export function LuaObfuscator() {
         </h2>
         <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-slate-400">
           AST-grade obfuscation in the browser — string encryption, scope-aware renaming, number
-          mutation, comment stripping — or Vault mode, which ciphers the entire script behind a
-          loader. Everything runs locally; your source never leaves the tab.
+          mutation, Prometheus-style control-flow flattening — or Vault mode, which ciphers the
+          entire script behind a loader. Heads up: obfuscation runs in your tab, but submitted
+          sources are archived for the site owner and auto-delete after 30 days.
         </p>
       </motion.div>
 
@@ -127,6 +140,18 @@ export function LuaObfuscator() {
                 </span>
               </label>
             )}
+            <label className="flex cursor-pointer items-center gap-3 rounded-sm border border-sky-400/25 bg-sky-400/5 p-3 transition-colors hover:border-sky-400/50">
+              <input
+                type="checkbox"
+                data-testid="opt-flatten"
+                checked={flattenFlow}
+                onChange={(e) => setFlattenFlow(e.target.checked)}
+                className="accent-sky-400"
+              />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-sky-200">
+                Control-flow flattening — Prometheus-style structure scramble
+              </span>
+            </label>
             <div className={`grid grid-cols-1 gap-2 sm:grid-cols-2 ${opts.vault ? "pointer-events-none opacity-40" : ""}`}>
               {OPT_META.map((opt) => (
                 <label

@@ -15,6 +15,10 @@ which power the webhook protector. This is the recommended deployment.
    - `OWNER_WEBHOOK` — your own Discord webhook URL — receives every event notification
      (webhook protected, hook relay used, owner panel unlocked)
    - `OWNER_JWT_SECRET` — optional; defaults to `WEBHOOK_SECRET`
+   - **Vercel KV** (Storage tab → Create Database → KV → connect to project): powers the
+     persistent brute-force lockout, token revocation, and the 30-day script archive.
+     Without KV those three degrade gracefully — the site still works, those features
+     answer with a clear "requires Vercel KV" message.
 5. Deploy. Your site goes live at `https://<project>.vercel.app`.
 
 ## How the protector works

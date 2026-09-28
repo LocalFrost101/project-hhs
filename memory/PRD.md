@@ -72,6 +72,26 @@ nearby hidden devices and identifies what kind of device each is, with Wi-Fi awa
   recovers single/double vault + deep strings; rejects foreign code); browser pass —
   multivault 242B→4249B, wrong-code error shown, unlock → panel, deob recovered source.
 
+## Implemented (2026-09-28, part 4 — flattening, revocation, archive, KV lockout)
+- **Control-flow flattening** (`flattenChunkFlow`): top-level statements become blocks in a
+  shuffled `while` + `if/elseif` state dispatcher with random state IDs; top-level locals are
+  lifted into a prelude so scope survives; execution order preserved by explicit state chaining.
+  Safety rails: skips on goto/labels, <2 statements, or shadowed duplicate local names.
+  Composes: deep → flatten → vault stack all in one run. Verified in fengari: identity on
+  samples incl. top-level return, and deep+flatten+double-vault composition.
+- **Token revocation**: owner clicks "Revoke token" on a webhook_protected log row →
+  POST /api/owner/revoke {token_hash} (owner-gated) → Mongo `revoked_tokens` (unique idx) /
+  Vercel KV `revoked:<hash>` (30-day) → hook route answers 403 "Token revoked by owner".
+  Verified end-to-end with curl (revoke → 403).
+- **Script archive**: every obfuscate submission POSTs source to /api/scripts → Mongo
+  `owner_scripts` with TTL index (expires_at, 30 days) / Vercel KV setex. Owner panel lists
+  archives with one-click .lua download. UI discloses archiving (honesty fix).
+- **Vercel KV lockout**: owner/unlock does INCR lockout:<ip> + EXPIRE 900, >5 → 429, DEL on
+  success. Zero-dep Upstash REST client (kvCmd) in api/_owner.ts; everything degrades
+  gracefully (null → feature off with clear 503) when KV env vars are absent.
+- Verified: 9/9 vitest, typecheck clean, curl chain (upload → list → revoke → 403),
+  browser pass (flatten run, owner unlock, revoke buttons, archive panel).
+
 ## Verification done
 - `yarn typecheck` clean; `yarn build` clean (dist ~148 kB gzip JS).
 - API smoke via public URL: GET /api/ + POST /api/status OK.

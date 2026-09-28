@@ -77,3 +77,22 @@ async def get_logs(request: Request):
     _verify(request)
     docs = await db.owner_logs.find({}, {"_id": 0}).sort("timestamp", -1).to_list(50)
     return {"logs": docs, "notify": bool(os.environ.get("OWNER_WEBHOOK"))}
+
+
+class RevokeRequest(BaseModel):
+    token_hash: str
+
+
+@router.post("/revoke")
+async def revoke_token(req: RevokeRequest, request: Request):
+    _verify(request)
+    h = req.token_hash.lower()
+    if len(h) != 64 or any(c not in "0123456789abcdef" for c in h):
+        raise HTTPException(status_code=400, detail="Invalid token hash")
+    await db.revoked_tokens.update_one(
+        {"token_hash": h},
+        {"$set": {"token_hash": h, "revoked_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True,
+    )
+    await log_event("token_revoked", f"Token hash `{h[:12]}…` revoked by owner")
+    return {"revoked": True}

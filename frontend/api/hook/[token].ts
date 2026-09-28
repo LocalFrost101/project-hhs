@@ -2,7 +2,7 @@
 // Decrypts the token server-side and forwards the payload to the real Discord webhook,
 // so the webhook URL never appears in client code.
 import { createDecipheriv, createHash } from "crypto";
-import { notifyOwner } from "../_owner";
+import { kvCmd, notifyOwner } from "../_owner";
 
 const WEBHOOK_RE = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/;
 
@@ -25,6 +25,11 @@ export default async function handler(req: any, res: any) {
     ]).toString("utf8");
     if (!WEBHOOK_RE.test(url)) {
       return res.status(400).json({ detail: "Invalid token payload" });
+    }
+    const tokenHash = createHash("sha256").update(String(req.query.token)).digest("hex");
+    const revoked = await kvCmd("get", `revoked:${tokenHash}`);
+    if (revoked !== null) {
+      return res.status(403).json({ detail: "Token revoked by owner" });
     }
     const queryIndex = String(req.url).indexOf("?");
     const query = queryIndex >= 0 ? String(req.url).slice(queryIndex) : "";
