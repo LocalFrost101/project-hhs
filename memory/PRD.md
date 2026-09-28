@@ -30,6 +30,27 @@ nearby hidden devices and identifies what kind of device each is, with Wi-Fi awa
 - Brand: Blues DET logo mark (SVG, also favicon), obsidian + phosphor-blue tactical aesthetic,
   Outfit display + JetBrains Mono data type.
 
+## Implemented (2026-09-28, part 2 — security suite)
+- **Webhook Protector** (`#protector`): Discord webhook URL → AES-256-GCM encrypted server-side
+  (key = SHA-256 of WEBHOOK_SECRET env) → opaque `/api/hook/<token>` proxy URL; hook route decrypts
+  in memory and forwards payloads to Discord (query passthrough, status passthrough). Implemented
+  twice with identical token format: FastAPI `backend/routers/protect.py` (Emergent preview) and
+  Vercel functions `frontend/api/protect.ts` + `frontend/api/hook/[token].ts`. UI also has a
+  client-side leak scanner (finds exposed webhook URLs in pasted code) and a webhook inspector
+  (validates against Discord's API, shows name/guild/channel/avatar).
+- **Lua Obfuscator** (`#obfuscator`): browser-side engine `src/lib/obfuscate.ts` on luaparse.
+  Vault mode: whole-script additive cipher + `loadstring or load` bootstrap (works with any Lua
+  dialect incl. Luau). Deep mode: string encryption (byte-table + string.char decoder), scope-aware
+  local renaming (controlled AST traversal), number mutation (int → hex arithmetic), comment
+  stripping (string-aware scanner). luaparse 0.3.x quirk: literal `.value` is null — decoded from
+  `.raw` with a conservative escape decoder (skips \x/\ddd/\u escapes rather than mis-decoding).
+- Verified: vitest + fengari (real Lua 5.3 VM in Node) — deep and vault outputs execute
+  byte-identically to source; strings/locals provably hidden. Protect endpoint verified through the
+  public URL (token issued; forwarding confirmed by Discord's own "Unknown Webhook" 404 response;
+  invalid URLs rejected with 400).
+- Vercel deploy path: `frontend/vercel.json` (SPA rewrite), functions auto-detected from
+  `frontend/api/`, guide in VERCEL.md (root=frontend, WEBHOOK_SECRET env).
+
 ## Verification done
 - `yarn typecheck` clean; `yarn build` clean (dist ~148 kB gzip JS).
 - API smoke via public URL: GET /api/ + POST /api/status OK.

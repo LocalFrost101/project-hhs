@@ -25,6 +25,13 @@ yarn build
 
 Upload the contents of `frontend/dist/` to any static host (Pages, Netlify, Vercel, S3…).
 
+## What works where
+
+GitHub Pages is static-only: the device detector and the Lua obfuscator work fully there.
+The webhook protector needs the serverless functions in `frontend/api/` — deploy to
+Vercel for the full suite (see VERCEL.md). The protector panel says so in-app when the
+functions aren't reachable.
+
 ## Browser support notes
 
 - **BLE radar / device picker**: Chrome, Edge, Opera (HTTPS required). On desktop Chrome,

@@ -2,10 +2,10 @@ import { Logo } from "@/components/bluesdet/Logo";
 import { scrollToId } from "@/lib/scroll";
 import { Radar } from "lucide-react";
 
-const LINKS: Array<{ id: string; label: string; testid: string }> = [
-  { id: "scanner", label: "Scanner", testid: "nav-link-scanner" },
-  { id: "features", label: "Features", testid: "nav-link-features" },
-  { id: "compatibility", label: "Compatibility", testid: "nav-link-compatibility" },
+const LINKS = [
+  { id: "scanner", label: "Detector", testid: "nav-link-detector" },
+  { id: "protector", label: "Protector", testid: "nav-link-protector" },
+  { id: "obfuscator", label: "Obfuscator", testid: "nav-link-obfuscator" },
   { id: "deploy", label: "Deploy", testid: "nav-link-deploy" },
 ];
 

@@ -112,6 +112,21 @@ export function Compatibility() {
                 Pages serves over HTTPS automatically — the one hard requirement for Web Bluetooth.
                 Full instructions live in <span className="text-sky-300">GITHUB_PAGES.md</span>.
               </p>
+              <div className="mt-5 rounded-sm border border-sky-400/20 bg-sky-400/5 p-4">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-sky-300">
+                  Full suite on Vercel
+                </p>
+                <ol className="mt-3 space-y-2 font-mono text-[11px] leading-relaxed text-slate-400">
+                  <li>1. Import the repo at vercel.com/new</li>
+                  <li>2. Root directory: <span className="text-sky-300">frontend</span></li>
+                  <li>3. Env var: <span className="text-sky-300">WEBHOOK_SECRET</span> — any long random string</li>
+                  <li>4. Deploy — the webhook protector activates</li>
+                </ol>
+                <p className="mt-3 font-mono text-[10px] leading-relaxed text-slate-500">
+                  Details in VERCEL.md. Pages stays perfect for the static detector + obfuscator;
+                  the protector needs the serverless functions.
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>

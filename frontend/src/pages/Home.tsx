@@ -4,6 +4,8 @@ import { Header } from "@/components/bluesdet/Header";
 import { Hero } from "@/components/bluesdet/Hero";
 import { Marquee } from "@/components/bluesdet/Marquee";
 import { ScannerHub } from "@/components/bluesdet/ScannerHub";
+import { WebhookProtector } from "@/components/bluesdet/WebhookProtector";
+import { LuaObfuscator } from "@/components/bluesdet/LuaObfuscator";
 import { Bento } from "@/components/bluesdet/Bento";
 import { Compatibility } from "@/components/bluesdet/Compatibility";
 import { Footer } from "@/components/bluesdet/Footer";
@@ -36,6 +38,8 @@ export default function Home() {
         <Hero ble={ble} />
         <Marquee />
         <ScannerHub ble={ble} />
+        <WebhookProtector />
+        <LuaObfuscator />
         <Bento />
         <Compatibility />
       </main>
