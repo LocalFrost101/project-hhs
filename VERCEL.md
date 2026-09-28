@@ -15,10 +15,14 @@ which power the webhook protector. This is the recommended deployment.
    - `OWNER_WEBHOOK` — your own Discord webhook URL — receives every event notification
      (webhook protected, hook relay used, owner panel unlocked)
    - `OWNER_JWT_SECRET` — optional; defaults to `WEBHOOK_SECRET`
-   - **Vercel KV** (Storage tab → Create Database → KV → connect to project): powers the
-     persistent brute-force lockout, token revocation, and the 30-day script archive.
-     Without KV those three degrade gracefully — the site still works, those features
-     answer with a clear "requires Vercel KV" message.
+   - **Upstash Redis via the Vercel Marketplace** (Vercel retired the old "KV" button):
+     project → **Storage** tab → find **Upstash (Redis)** in the marketplace list →
+     install/connect it to this project. It auto-injects `KV_REST_API_URL` /
+     `KV_REST_API_TOKEN` (the code also accepts `UPSTASH_REDIS_REST_URL/TOKEN`).
+     This powers the persistent brute-force lockout, token revocation, and the 30-day
+     script archive. Without it those three degrade gracefully — the site still works,
+     they just answer with a clear "requires Vercel KV" message. **Redeploy after
+     connecting** so the functions pick up the env vars.
 5. Deploy. Your site goes live at `https://<project>.vercel.app`.
 
 ## How the protector works
