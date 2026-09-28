@@ -9,9 +9,12 @@ which power the webhook protector. This is the recommended deployment.
 2. Go to **vercel.com/new** and import **LocalFrost101/project-hhs**.
 3. Set **Root Directory** to `frontend` (click Edit next to the root). Vercel
    auto-detects Vite — build command and output directory fill themselves in.
-4. Add an environment variable:
-   - **Name:** `WEBHOOK_SECRET`
-   - **Value:** any long random string (e.g. run `openssl rand -hex 32`)
+4. Add environment variables:
+   - `WEBHOOK_SECRET` — any long random string (`openssl rand -hex 32`) — encrypts protected webhooks
+   - `OWNER_CODE` — your secret access code for the Owner tab (make it long and random)
+   - `OWNER_WEBHOOK` — your own Discord webhook URL — receives every event notification
+     (webhook protected, hook relay used, owner panel unlocked)
+   - `OWNER_JWT_SECRET` — optional; defaults to `WEBHOOK_SECRET`
 5. Deploy. Your site goes live at `https://<project>.vercel.app`.
 
 ## How the protector works

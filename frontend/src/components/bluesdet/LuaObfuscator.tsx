@@ -35,6 +35,7 @@ export function LuaObfuscator() {
     mutateNumbers: true,
     stripComments: true,
   });
+  const [multiVault, setMultiVault] = useState(false);
   const [result, setResult] = useState<ObfuscateResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -42,7 +43,7 @@ export function LuaObfuscator() {
   const run = () => {
     setError(null);
     try {
-      setResult(obfuscateLua(source, opts));
+      setResult(obfuscateLua(source, opts, multiVault ? 2 : 1));
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -112,6 +113,20 @@ export function LuaObfuscator() {
                 </span>
               </span>
             </label>
+            {opts.vault && (
+              <label className="flex cursor-pointer items-center gap-3 rounded-sm border border-amber-400/30 bg-amber-400/5 p-3 transition-colors hover:border-amber-400/50">
+                <input
+                  type="checkbox"
+                  data-testid="opt-multivault"
+                  checked={multiVault}
+                  onChange={(e) => setMultiVault(e.target.checked)}
+                  className="accent-amber-400"
+                />
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-amber-200">
+                  ×2 nested vault — WeAreDevs-grade hard scramble
+                </span>
+              </label>
+            )}
             <div className={`grid grid-cols-1 gap-2 sm:grid-cols-2 ${opts.vault ? "pointer-events-none opacity-40" : ""}`}>
               {OPT_META.map((opt) => (
                 <label

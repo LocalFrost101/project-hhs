@@ -24,16 +24,64 @@ export interface ObfuscateResult {
 const randKey = () => 1 + Math.floor(Math.random() * 255);
 const toBytes = (s: string): number[] => Array.from(new TextEncoder().encode(s));
 
-export function vaultWrap(source: string): string {
+function vaultLayer(payload: string, outermost: boolean): string {
   const k = randKey();
-  const enc = toBytes(source).map((b) => (b + k) % 256);
-  return [
-    "--[[ protected by BLUES DET vault ]]",
-    `local _D={${enc.join(",")}}local _K=${k}`,
-    "local _L=loadstring or load",
-    "local _B={}for _I=1,#_D do _B[_I]=string.char((_D[_I]-_K)%256)end",
-    'local _F=_L(table.concat(_B))assert(_F,"BLUES DET: runtime cannot load strings")return _F()',
-  ].join("\n");
+  const m = 3 + Math.floor(Math.random() * 250);
+  const enc = toBytes(payload).map((b, i) => (b + k + i * m) % 256);
+  const body = `local _D={${enc.join(",")}}local _K=${k} local _M=${m} local _L=loadstring or load local _B={}for _I=1,#_D do _B[_I]=string.char((_D[_I]-_K-(_I-1)*_M)%256)end local _F=_L(table.concat(_B))assert(_F,"BLUES DET: runtime cannot load strings")return _F()`;
+  const wrapped = `return(function()${body}end)()`;
+  return outermost ? `--[[ BLUES DET VAULT v2 · hardened scramble ]]\n${wrapped}` : wrapped;
+}
+
+// WeAreDevs-grade hard scramble: position-keyed byte cipher, return-function loader,
+// optional multi-layer nesting (vault of a vault).
+export function vaultWrap(source: string, layers = 1): string {
+  const n = Math.min(3, Math.max(1, layers));
+  let code = source;
+  for (let i = 0; i < n; i++) code = vaultLayer(code, i === n - 1);
+  return code;
+}
+
+function luaQuoteBytes(bytes: number[]): string {
+  let out = '"';
+  for (const b of bytes) {
+    if (b === 34) out += '\\"';
+    else if (b === 92) out += "\\\\";
+    else if (b === 10) out += "\\n";
+    else if (b < 32 || b > 126) out += `\\${b.toString().padStart(3, "0")}`;
+    else out += String.fromCharCode(b);
+  }
+  return out + '"';
+}
+
+// Reverses Blues DET vault layers (v1 flat key and v2 position key) and deep-mode
+// __S string tables. Returns null when the input isn't recognizable Blues DET output.
+export function deobfuscateVault(code: string): string | null {
+  let current = code.trim();
+  let touched = false;
+  for (let layer = 0; layer < 5; layer++) {
+    const dMatch = /local\s+_D=\{([\d,]+)\}/.exec(current);
+    if (!dMatch) break;
+    const kMatch = /local\s+_K=(\d+)/.exec(current);
+    if (!kMatch) break;
+    const mMatch = /local\s+_M=(\d+)/.exec(current);
+    const bytes = dMatch[1].split(",").map(Number);
+    const k = Number(kMatch[1]);
+    const m = mMatch ? Number(mMatch[1]) : 0;
+    current = new TextDecoder().decode(
+      new Uint8Array(bytes.map((b, i) => (((b - k - i * m) % 256) + 256) % 256)),
+    );
+    touched = true;
+  }
+  let strings = 0;
+  current = current.replace(/__S\(\{([\d,]+)\},(\d+)\)/g, (_m, nums: string, kk: string) => {
+    const bytes = nums.split(",").map(Number);
+    const k = Number(kk);
+    strings++;
+    return luaQuoteBytes(bytes.map((b) => (((b - k) % 256) + 256) % 256));
+  });
+  if (strings > 0) touched = true;
+  return touched ? current : null;
 }
 
 export function stripLuaComments(src: string): string {
@@ -140,9 +188,9 @@ function walkAll(node: unknown, cb: (n: Record<string, unknown>) => void) {
   }
 }
 
-export function obfuscateLua(source: string, opts: ObfuscateOptions): ObfuscateResult {
+export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1): ObfuscateResult {
   if (opts.vault) {
-    const code = vaultWrap(source);
+    const code = vaultWrap(source, layers);
     return { code, stats: { original: source.length, obfuscated: code.length, strings: 0, locals: 0, numbers: 0 } };
   }
 

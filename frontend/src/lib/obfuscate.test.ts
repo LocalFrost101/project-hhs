@@ -54,4 +54,24 @@ describe("obfuscateLua", () => {
     const { code } = obfuscateLua(SAMPLE, ALL_ON);
     expect(runLua(code)).toBe(runLua(SAMPLE));
   });
+
+  it("double-layer vault executes identically and deobfuscator recovers the source", async () => {
+    const { deobfuscateVault } = await import("./obfuscate");
+    const hardened = vaultWrap(SAMPLE, 2);
+    expect(runLua(hardened)).toBe(runLua(SAMPLE));
+    expect(deobfuscateVault(hardened)).toBe(SAMPLE);
+    expect(deobfuscateVault(vaultWrap(SAMPLE))).toBe(SAMPLE);
+  });
+
+  it("deobfuscator decodes deep-mode string tables", async () => {
+    const { deobfuscateVault } = await import("./obfuscate");
+    const { code } = obfuscateLua(`print("sensitive-token-123")`, ALL_ON);
+    const recovered = deobfuscateVault(code);
+    expect(recovered).toContain('"sensitive-token-123"');
+  });
+
+  it("deobfuscator rejects foreign code", async () => {
+    const { deobfuscateVault } = await import("./obfuscate");
+    expect(deobfuscateVault(`print("hello")`)).toBeNull();
+  });
 });

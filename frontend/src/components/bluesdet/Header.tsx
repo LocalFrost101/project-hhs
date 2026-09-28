@@ -6,6 +6,7 @@ const LINKS = [
   { id: "scanner", label: "Detector", testid: "nav-link-detector" },
   { id: "protector", label: "Protector", testid: "nav-link-protector" },
   { id: "obfuscator", label: "Obfuscator", testid: "nav-link-obfuscator" },
+  { id: "owner", label: "Owner", testid: "nav-link-owner" },
   { id: "deploy", label: "Deploy", testid: "nav-link-deploy" },
 ];
 

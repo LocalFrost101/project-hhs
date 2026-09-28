@@ -6,6 +6,7 @@ import { Marquee } from "@/components/bluesdet/Marquee";
 import { ScannerHub } from "@/components/bluesdet/ScannerHub";
 import { WebhookProtector } from "@/components/bluesdet/WebhookProtector";
 import { LuaObfuscator } from "@/components/bluesdet/LuaObfuscator";
+import { OwnerSection } from "@/components/bluesdet/OwnerSection";
 import { Bento } from "@/components/bluesdet/Bento";
 import { Compatibility } from "@/components/bluesdet/Compatibility";
 import { Footer } from "@/components/bluesdet/Footer";
@@ -40,6 +41,7 @@ export default function Home() {
         <ScannerHub ble={ble} />
         <WebhookProtector />
         <LuaObfuscator />
+        <OwnerSection />
         <Bento />
         <Compatibility />
       </main>

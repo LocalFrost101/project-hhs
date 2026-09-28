@@ -2,6 +2,7 @@
 // Decrypts the token server-side and forwards the payload to the real Discord webhook,
 // so the webhook URL never appears in client code.
 import { createDecipheriv, createHash } from "crypto";
+import { notifyOwner } from "../_owner";
 
 const WEBHOOK_RE = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/;
 
@@ -33,6 +34,7 @@ export default async function handler(req: any, res: any) {
       body: JSON.stringify(req.body ?? {}),
     });
     const text = await discord.text();
+    await notifyOwner("hook_relay", `Token \`${String(req.query.token).slice(0, 10)}…\` → Discord ${discord.status}`);
     return res.status(discord.status).setHeader("Content-Type", "application/json").send(text || "{}");
   } catch {
     return res.status(400).json({ detail: "Invalid or corrupted token" });

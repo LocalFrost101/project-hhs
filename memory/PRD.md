@@ -51,6 +51,27 @@ nearby hidden devices and identifies what kind of device each is, with Wi-Fi awa
 - Vercel deploy path: `frontend/vercel.json` (SPA rewrite), functions auto-detected from
   `frontend/api/`, guide in VERCEL.md (root=frontend, WEBHOOK_SECRET env).
 
+## Implemented (2026-09-28, part 3 — hardened vault + owner tab)
+- **Vault v2 "hard scramble"**: position-keyed additive byte cipher (`_K` + `_M` multiplier),
+  WeAreDevs-style `return(function() ... end)()` loader, optional ×2 nested vault
+  (`obfuscateLua(src, opts, layers)`). Banner: `BLUES DET VAULT v2 · hardened scramble`.
+- **Deobfuscator** (`deobfuscateVault`): reverses v1/v2 vault layers (loops until no `_D`
+  pattern) + deep-mode `__S` string tables (byte-exact Lua re-quoting). Returns null on
+  foreign code.
+- **Owner tab** (`#owner`, amber "classified" theme): access-code gate → POST
+  `/api/owner/unlock` → 30-min HS256 JWT (Bearer, memory-only, never persisted);
+  5 fails/IP = 15-min lockout (FastAPI in-memory). Panels: vault deobfuscator + activity
+  log (Mongo `owner_logs`, newest 50) + Discord-notify status. Lock button clears session.
+- **Owner notifications**: every event (webhook_protected, hook_relay, owner_unlock) logged
+  to Mongo AND posted as a Discord embed to `OWNER_WEBHOOK` when set. Identical behavior in
+  FastAPI (lib/ownerlog.py) and Vercel functions (api/_owner.ts + owner/unlock.ts +
+  owner/logs.ts — manual HMAC-SHA256 JWT, byte-compatible with pyjwt).
+- Env: OWNER_CODE, OWNER_JWT_SECRET (falls back to WEBHOOK_SECRET), OWNER_WEBHOOK.
+- Verified: curl — wrong code 401, no token 401, right code → JWT → logs 200 with Mongo
+  history; vitest 6/6 (double vault executes identically in fengari VM; deobfuscator
+  recovers single/double vault + deep strings; rejects foreign code); browser pass —
+  multivault 242B→4249B, wrong-code error shown, unlock → panel, deob recovered source.
+
 ## Verification done
 - `yarn typecheck` clean; `yarn build` clean (dist ~148 kB gzip JS).
 - API smoke via public URL: GET /api/ + POST /api/status OK.
