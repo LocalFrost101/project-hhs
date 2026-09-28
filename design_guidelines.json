@@ -1,0 +1,272 @@
+{
+  "project_name": "NULLFIELD RF-X | Tactical Counter-Surveillance & Signal Disruption Architecture",
+  "brand_identity": {
+    "name": "NULLFIELD",
+    "codename": "NULLFIELD RF-X TACTICAL SPECTRUM DOMINANCE",
+    "tagline": "Tactical RF Counter-Surveillance & Spectrum Nullification Hardware",
+    "aesthetic": "High-end Defense-Tech / Tactical Obsidian & Radar Phosphor / Brutalist Aerospace UI",
+    "brand_mark_svg_concept": "Geometric crosshair octagon fused with an offset null-set diagonal strike and concentric RF wave arcs in #22c55e (Radar Emerald) and #0a0a0c (Tactical Obsidian)."
+  },
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#060709",
+        "on_bg": "#F1F5F9",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "accent_highlight": "#22C55E",
+          "amber_alert": "#F59E0B",
+          "crimson_active": "#EF4444",
+          "border_subtle": "#1E293B"
+        }
+      },
+      {
+        "name": "tactical_card",
+        "kind": "solid",
+        "bg": "#0C0E12",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "border": "#1E2633",
+          "radar_glow": "#22C55E",
+          "badge_bg": "#111A18",
+          "badge_border": "#166534"
+        }
+      },
+      {
+        "name": "glass_hud_header",
+        "kind": "glass",
+        "contrast_against": "#08090C",
+        "guarantee": "backdrop-blur-xl bg-[#060709]/80 border-b border-[#22C55E]/20",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "link_hover": "#4ADE80",
+          "status_dot": "#22C55E"
+        }
+      },
+      {
+        "name": "hero_viewport",
+        "kind": "solid",
+        "bg": "#07080B",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "radar_grid": "#15803D",
+          "sweep_gradient": "rgba(34, 197, 94, 0.15)",
+          "terminal_amber": "#FBBF24"
+        }
+      },
+      {
+        "name": "spec_matrix_panel",
+        "kind": "solid",
+        "bg": "#090B0E",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#8492A6",
+        "roles": {
+          "metric_number": "#22C55E",
+          "table_border": "#1E293B",
+          "row_hover": "#0F1318"
+        }
+      },
+      {
+        "name": "legal_disclaimer_panel",
+        "kind": "solid",
+        "bg": "#0E0E12",
+        "on_bg": "#E2E8F0",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "border": "#78350F",
+          "badge_amber": "#F59E0B"
+        }
+      }
+    ],
+    "accent": "#22C55E",
+    "on_accent": "#041508"
+  },
+  "typography": {
+    "font_import": "@fontsource-variable/jetbrains-mono",
+    "font_heading_family": "'Outfit Variable', sans-serif",
+    "font_sans_family": "'JetBrains Mono Variable', monospace",
+    "font_mono_family": "'JetBrains Mono Variable', monospace",
+    "scale_px": {
+      "display": 56,
+      "h1": 44,
+      "h2": 32,
+      "h3": 22,
+      "body": 16,
+      "caption": 14
+    },
+    "typesetting_rules": {
+      "headings": "font-black tracking-tight uppercase font-heading",
+      "data_values": "font-mono font-bold tracking-tight text-emerald-400",
+      "body_copy": "font-sans leading-relaxed text-slate-300 tracking-normal",
+      "overlines": "font-mono text-xs uppercase tracking-[0.25em] text-emerald-500/90 font-semibold"
+    }
+  },
+  "entry_surfaces": {
+    "/": "split hero — brand codename + kinetic tactical headline + spec badge clusters left, interactive 3D/Canvas real-time radar spectrum scanner widget right"
+  },
+  "component_hierarchy_and_structure": {
+    "header": {
+      "component": "@/components/tactical/Header.tsx",
+      "style": "Sticky glassmorphism with emerald radar status beacon, live frequency monitor ticker, navigation links (Overview, Spectrum, Detection 50M, Jamming 40M, Specs, Compliance), and Quick Deploy CTA button.",
+      "data_testids": {
+        "header": "tactical-nav-header",
+        "brand_logo": "brand-logo-mark",
+        "nav_link_overview": "nav-link-overview",
+        "nav_link_specs": "nav-link-specs",
+        "nav_link_detection": "nav-link-detection",
+        "nav_link_legal": "nav-link-legal",
+        "cta_request_brief": "header-btn-request-spec"
+      }
+    },
+    "hero_section": {
+      "component": "@/components/tactical/HeroSection.tsx",
+      "style": "Kinetic tactical showcase featuring line-by-line staggered text reveal, interactive radar oscilloscope with live ping frequency simulation, 40M Jamming / 50M Detection HUD pill chips, and real-time spectrum noise generator.",
+      "key_elements": [
+        "Brand badge: [SEC-LEVEL 4 // ACTIVE RF-X PROTOCOL]",
+        "H1: 'TACTICAL RF DOMINANCE. ZERO PERIMETER COMPROMISE.'",
+        "Subheading: Military-grade localized counter-surveillance hardware. 40-meter omnidirectional signal suppression paired with 50-meter pinpoint multi-band optical/RF threat discovery.",
+        "Interactive Range HUD dial: Switch between 40m Jamming Mode and 50m Discovery Radar",
+        "Primary CTA: 'ACQUIRE SPECIFICATION DOSSIER', Secondary CTA: 'LAUNCH INTERACTIVE RADAR SIMULATOR'"
+      ]
+    },
+    "editorial_ticker": {
+      "component": "@/components/tactical/EditorialMarquee.tsx",
+      "style": "Ultra-slow tactical telemetry stream displaying frequency bands (433MHz, 868MHz, 915MHz, 1.2GHz, 2.4GHz, 5.8GHz, Sub-GHz) + Status: NULLIFIED.",
+      "data_testid": "tactical-telemetry-marquee"
+    },
+    "core_metrics_bento": {
+      "component": "@/components/tactical/CoreMetricsBento.tsx",
+      "style": "Tetris-style Asymmetric Bento Grid featuring Tactical Wireframe borders, CRT scanlines, and animated metric counters.",
+      "grid_items": [
+        {
+          "span": "col-span-12 md:col-span-7",
+          "title": "40M RADIUS SIGNAL SUPPRESSION",
+          "description": "Multi-vector RF disruption targeting cellular 5G/LTE, 2.4/5.8GHz Wi-Fi, GNSS L1/L2 GPS, and drone command uplinks simultaneously.",
+          "metric": "40 METERS",
+          "icon": "ShieldAlert"
+        },
+        {
+          "span": "col-span-12 md:col-span-5",
+          "title": "50M THREAT DETECTION MATRIX",
+          "description": "Passive wideband spectrum sensor sweeps 10MHz - 6GHz to detect hidden wireless transmitters, pinhole cameras, and audio bugs.",
+          "metric": "50 METERS",
+          "icon": "Radio"
+        },
+        {
+          "span": "col-span-12 md:col-span-4",
+          "title": "OPTICAL & INFRARED LENS DISCOVERY",
+          "description": "Strobe retro-reflection scanner identifies disguised CMOS/CCD optical sensors through tinted glass or enclosures.",
+          "metric": "0.01 LUX",
+          "icon": "Eye"
+        },
+        {
+          "span": "col-span-12 md:col-span-4",
+          "title": "INSTANT FREQUENCY NULLIFICATION",
+          "description": "Sub-millisecond dynamic pulse hopping defeats frequency-agile eavesdropping transmitters.",
+          "metric": "< 1.2 MS",
+          "icon": "Zap"
+        },
+        {
+          "span": "col-span-12 md:col-span-4",
+          "title": "TACTICAL RUNTIME & ENCLOSURE",
+          "description": "CNC milled aviation aluminum with mil-spec IP67 environmental sealing and dual swappable LiFePO4 cells.",
+          "metric": "8.5 HRS",
+          "icon": "Cpu"
+        }
+      ]
+    },
+    "threat_detection_deep_dive": {
+      "component": "@/components/tactical/DetectionBreakdown.tsx",
+      "style": "Interactive interactive tabbed threat classifier detailing how NULLFIELD RF-X categorizes covert surveillance targets.",
+      "categories": [
+        {
+          "id": "cameras",
+          "name": "Covert & Pinhole Cameras",
+          "tech": "Infrared Retro-Reflection + 2.4/5.8GHz Analog/Digital Video Transmitters",
+          "detection_depth": "Identifies dormant and wired pinhole lenses up to 50m with visual HUD crosshair guidance.",
+          "signal_signature": "Pulse Amplitude Modulation + Video Carrier Waveforms"
+        },
+        {
+          "id": "rf_bugs",
+          "name": "Audio Bugs & GSM Transmitters",
+          "tech": "Near-Field Non-Linear Junction Detection (NLJD) + Sub-GHz RF Sweeping",
+          "detection_depth": "Triangulates passive/active crystal-controlled microphones within 50m perimeter.",
+          "signal_signature": "Continuous FM/AM Carriers, GSM Burst Packets"
+        },
+        {
+          "id": "gps_trackers",
+          "name": "Real-Time GPS / Asset Trackers",
+          "tech": "GNSS Jamming + Cellular Upstream Detection",
+          "detection_depth": "Nullifies L1/L2 GPS positioning while notifying operator of beacon ping bursts.",
+          "signal_signature": "Satellite Fix Ephemeris Interception (1575.42 MHz)"
+        },
+        {
+          "id": "uas_drones",
+          "name": "Tactical Micro-UAVs",
+          "tech": "2.4GHz / 5.8GHz C2 Link Disruption + Video Downlink Jamming",
+          "detection_depth": "Forces automated failsafe return-to-home or controlled vertical descent at 40m perimeter.",
+          "signal_signature": "FHSS Spread Spectrum Synchronization"
+        }
+      ]
+    },
+    "technical_spec_matrix": {
+      "component": "@/components/tactical/TechnicalSpecMatrix.tsx",
+      "style": "Monospaced tactical data matrix comparing Nullfield RF-X Pro vs Defense Enterprise variants.",
+      "data_testid": "specs-table-container"
+    },
+    "interactive_range_simulator": {
+      "component": "@/components/tactical/InteractiveRadarSimulator.tsx",
+      "style": "Interactive 2D Canvas radar widget allowing user to test 40m Jamming field and 50m Detection sweep against mock surveillance threats."
+    },
+    "compliance_legal_dossier": {
+      "component": "@/components/tactical/ComplianceDossier.tsx",
+      "style": "Tactical amber-bordered disclaimer card for institutional, defense, and authorized government procurement compliance.",
+      "data_testid": "legal-compliance-section"
+    },
+    "footer": {
+      "component": "@/components/tactical/TacticalFooter.tsx",
+      "style": "High-contrast massive tactical footer with oversized brand typography (NULLFIELD // RF-X), live UTC clock, system health status, and encrypted contact portal.",
+      "data_testid": "tactical-footer"
+    }
+  },
+  "image_urls": {
+    "circuitry_macro": {
+      "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwxfHx0YWN0aWNhbCUyMGVsZWN0cm9uaWNzJTIwaGFyZHdhcmV8ZW58MHx8fHwxNzkwNTgxMTcwfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Dark tactical electronics circuit board for hardware architecture section",
+      "category": "product_hardware"
+    },
+    "satellite_radar": {
+      "url": "https://images.unsplash.com/photo-1572224104782-91a08d296390?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwyfHxtaWxpdGFyeSUyMHJhZGFyJTIwYW50ZW5uYSUyMGRhcmt8ZW58MHx8fHwxNzkwNTgxMTcwfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Dark tactical military radar dish for spectrum defense section background",
+      "category": "background_texture"
+    },
+    "defense_terminal": {
+      "url": "https://images.unsplash.com/photo-1562408590-e32931084e23?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwyfHx0YWN0aWNhbCUyMGVsZWN0cm9uaWNzJTIwaGFyZHdhcmV8ZW58MHx8fHwxNzkwNTgxMTcwfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Close-up tactical multi-layer electronic processing board",
+      "category": "hardware_details"
+    }
+  },
+  "motion_and_interactions": {
+    "library": "motion/react",
+    "patterns": {
+      "hero_headline_reveal": "Staggered letter or word masked translateY reveal with easeOutQuart curve",
+      "radar_sweep": "Continuous 360deg conic-gradient rotation with pulsating ping blips at randomized threat coordinates",
+      "interactive_mode_switch": "Smooth spring transition between Jammer Field (40m circular aura) and Threat Sensor (50m scanline cone)",
+      "card_hover_effects": "1px emerald perimeter border brightening with subtle -translate-y-1 elevation and scanline glow"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Follow dark military tactical archetype: absolute dark canvas (#060709), tactical emerald accents (#22C55E), and amber warning highlights (#F59E0B).",
+    "Use @fontsource-variable/jetbrains-mono and @fontsource-variable/outfit for typography (pre-bundled).",
+    "Implement the interactive radar simulator allowing users to toggle between 40m Jamming suppression and 50m threat detection sweeps with live canvas rendering.",
+    "Ensure every interactive element has explicit data-testid attributes.",
+    "Include the comprehensive threat breakdown covering Cameras (pinhole/covert), RF bugs, GPS trackers, and Drones.",
+    "Add elegant legal compliance dossier container explaining authorized deployment protocols.",
+    "Include responsive layout suitable for mobile viewports up to ultra-wide displays."
+  ]
+}
