@@ -19,7 +19,7 @@ export function Bento() {
     <section id="features" data-testid="features-section" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
       <motion.div {...reveal} transition={{ duration: 0.7 }}>
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.35em] text-sky-400">
-          Module 02 // Capability matrix
+          Module 05 // Capability matrix
         </p>
         <h2 className="mt-3 max-w-2xl font-heading text-3xl font-black uppercase tracking-tight text-slate-50 sm:text-4xl">
           Built to find what shouldn't be there

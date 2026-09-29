@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Check, Copy, Eye, EyeOff, Lock, RefreshCw, ShieldCheck, Unlock } from "lucide-react";
 import { apiPost } from "@/lib/api";
+import { ServerStatusBanner } from "@/components/bluesdet/ServerStatusBanner";
 import { deobfuscateVault } from "@/lib/obfuscate";
 
 interface UnlockResponse {
@@ -152,12 +153,14 @@ export function OwnerSection() {
           transition={{ duration: 0.7 }}
         >
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.35em] text-amber-400">
-            Module 06 // Classified
+            Module 04 // Classified
           </p>
           <h2 className="mt-3 max-w-2xl font-heading text-3xl font-black uppercase tracking-tight text-slate-50 sm:text-4xl">
             Owner's eyes only
           </h2>
         </motion.div>
+
+        <ServerStatusBanner />
 
         {!token ? (
           <div className={`${PANEL} mx-auto mt-12 max-w-md`} data-testid="owner-locked-card">

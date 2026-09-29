@@ -78,7 +78,7 @@ export function LuaObfuscator() {
         transition={{ duration: 0.7 }}
       >
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.35em] text-sky-400">
-          Module 05 // Lua obfuscator
+          Module 03 // Lua obfuscator
         </p>
         <h2 className="mt-3 max-w-2xl font-heading text-3xl font-black uppercase tracking-tight text-slate-50 sm:text-4xl">
           Make your Lua unreadable

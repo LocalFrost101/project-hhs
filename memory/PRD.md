@@ -92,6 +92,18 @@ nearby hidden devices and identifies what kind of device each is, with Wi-Fi awa
 - Verified: 9/9 vitest, typecheck clean, curl chain (upload → list → revoke → 403),
   browser pass (flatten run, owner unlock, revoke buttons, archive panel).
 
+## Implemented (2026-09-28, part 5 — deployment clarity)
+- `useServerStatus` probe + `ServerStatusBanner` in Protector and Owner sections: auto-detects
+  whether serverless functions are reachable (JSON probe of /api/protect) and shows either
+  "SERVER MODULES LIVE" or a "STATIC DEPLOYMENT" explainer pointing to Vercel — kills the
+  "nothing works" confusion on GitHub Pages.
+- Protector error handling now distinguishes server-side detail errors (e.g. WEBHOOK_SECRET
+  missing) from static-host unreachability, with the right guidance for each.
+- Modules renumbered in page order: 01 Detector · 02 Protector · 03 Obfuscator · 04 Owner ·
+  05 Capability matrix · 06 Reality check/deploy.
+- kvCmd accepts both KV_REST_API_* and UPSTASH_REDIS_REST_* env names (Vercel sunset KV in
+  favor of the Upstash marketplace integration; VERCEL.md updated).
+
 ## Verification done
 - `yarn typecheck` clean; `yarn build` clean (dist ~148 kB gzip JS).
 - API smoke via public URL: GET /api/ + POST /api/status OK.

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { AlertTriangle, Check, Copy, KeyRound, ScanSearch, Webhook } from "lucide-react";
 import { apiPost } from "@/lib/api";
+import { ServerStatusBanner } from "@/components/bluesdet/ServerStatusBanner";
 
 interface ProtectResponse {
   token: string;
@@ -71,10 +72,13 @@ export function WebhookProtector() {
       setResult(await apiPost<ProtectResponse>("/protect", { url }));
     } catch (err) {
       const detail = (err as { body?: { detail?: string } })?.body?.detail;
-      setError(
-        detail ??
-          "Protect endpoint unreachable — this module needs the Vercel functions or the FastAPI backend live.",
-      );
+      if (detail) {
+        setError(detail);
+      } else {
+        setError(
+          "Server functions not reachable on this deployment. If you're on GitHub Pages that's expected — it's static-only. The protector runs on the Vercel deployment (see the Deploy section / VERCEL.md).",
+        );
+      }
     } finally {
       setBusy(false);
     }
@@ -112,7 +116,7 @@ export function WebhookProtector() {
           transition={{ duration: 0.7 }}
         >
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.35em] text-sky-400">
-            Module 04 // Webhook protector
+            Module 02 // Webhook protector
           </p>
           <h2 className="mt-3 max-w-2xl font-heading text-3xl font-black uppercase tracking-tight text-slate-50 sm:text-4xl">
             Hide the hook. Keep the signal.
@@ -123,6 +127,8 @@ export function WebhookProtector() {
             be leaked, spammed, or deleted out from under you.
           </p>
         </motion.div>
+
+        <ServerStatusBanner />
 
         <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-12">
           <div className={`${CARD} lg:col-span-7`} data-testid="protect-card">
