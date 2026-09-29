@@ -1,12 +1,12 @@
 const ITEMS = [
-  "BLE advertisement sweep",
-  "2.4 GHz spectrum",
-  "Magnetic anomaly",
-  "Hidden tracker",
-  "Covert camera",
-  "Rogue beacon",
-  "Network intel",
-  "Zero upload",
+  "Burner inbox",
+  "Webhook armor",
+  "Canary tripwire",
+  "Lua vault",
+  "Control-flow flatten",
+  "Junk injection",
+  "Zero accounts",
+  "30-day archive",
 ];
 
 export function Marquee() {

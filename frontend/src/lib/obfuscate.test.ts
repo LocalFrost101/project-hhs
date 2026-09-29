@@ -93,4 +93,14 @@ describe("obfuscateLua", () => {
     const { code } = obfuscateLua(SAMPLE, ALL_ON, 2, true);
     expect(runLua(code)).toBe(runLua(SAMPLE));
   });
+
+  it("junk injection keeps execution identical", () => {
+    const { code } = obfuscateLua(SAMPLE, ALL_ON, 1, false, true);
+    expect(runLua(code)).toBe(runLua(SAMPLE));
+  });
+
+  it("full stack: junk + flatten + deep + double vault", () => {
+    const { code } = obfuscateLua(SAMPLE, ALL_ON, 2, true, true);
+    expect(runLua(code)).toBe(runLua(SAMPLE));
+  });
 });

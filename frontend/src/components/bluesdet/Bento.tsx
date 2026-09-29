@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Activity, Fingerprint, Github, Radio, ScanSearch, Wifi } from "lucide-react";
+import { Activity, Archive, Bell, Fingerprint, Github, MailPlus, ScanSearch } from "lucide-react";
 
 const reveal = {
   initial: { opacity: 0, y: 28 },
@@ -27,23 +27,23 @@ export function Bento() {
       </motion.div>
 
       <div className="mt-12 grid grid-cols-12 gap-5">
-        <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.05 }} className={`${CARD} col-span-12 md:col-span-7`} data-testid="bento-card-radar">
-          <Radio className="h-5 w-5 text-sky-300" />
+        <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.05 }} className={`${CARD} col-span-12 md:col-span-7`} data-testid="bento-card-mail">
+          <MailPlus className="h-5 w-5 text-sky-300" />
           <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">
-            Live BLE radar
+            Burner inbox
           </h3>
           <p className="mt-2 max-w-md font-mono text-xs leading-relaxed text-slate-400">
-            A continuous 2.4 GHz advertisement sweep. Every beacon in range is captured, plotted on
-            the scope, and tracked over time with RSSI history.
+            One click mints a real receiving email address — no signup, no key, no trace. Mail
+            lands live in the tab; burn it and it never existed.
           </p>
-          <Metric>2.4 GHz sweep</Metric>
+          <Metric>0 signup</Metric>
         </motion.div>
 
         <motion.div
           {...reveal}
           transition={{ duration: 0.7, delay: 0.12 }}
           className={`${CARD} col-span-12 min-h-[220px] md:col-span-5`}
-          data-testid="bento-card-classifier"
+          data-testid="bento-card-vault"
         >
           <img
             src="img/detector_detail.jpeg"
@@ -54,46 +54,46 @@ export function Bento() {
           <div className="relative">
             <ScanSearch className="h-5 w-5 text-sky-300" />
             <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">
-              Signature classifier
+              Lua vault
             </h3>
             <p className="mt-2 max-w-sm font-mono text-xs leading-relaxed text-slate-400">
-              Broadcast names are matched against a signature bank — trackers, covert cameras,
-              wearables, vehicles, smart-home gear — and risk-rated on sight.
+              String encryption, scope-aware renaming, junk injection, control-flow flattening,
+              and a hardened nested loader — stacked, not swapped.
             </p>
-            <Metric>40+ signatures</Metric>
+            <Metric>5 layers</Metric>
           </div>
         </motion.div>
 
-        <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.05 }} className={`${CARD} col-span-12 md:col-span-4`} data-testid="bento-card-emf">
-          <Activity className="h-5 w-5 text-sky-300" />
-          <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">EMF field meter</h3>
+        <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.05 }} className={`${CARD} col-span-12 md:col-span-4`} data-testid="bento-card-canary">
+          <Bell className="h-5 w-5 text-sky-300" />
+          <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">Canary links</h3>
           <p className="mt-2 font-mono text-xs leading-relaxed text-slate-400">
-            Your phone's magnetometer watches for field spikes that betray powered electronics
-            behind walls, in clocks, or inside fixtures.
+            Protected webhook links carry a silent tripwire — anyone who opens one in a browser
+            pings your Discord instantly and sees a 404.
           </p>
-          <Metric>±0.1 µT</Metric>
+          <Metric>Instant</Metric>
         </motion.div>
 
-        <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.1 }} className={`${CARD} col-span-12 md:col-span-4`} data-testid="bento-card-network">
-          <Wifi className="h-5 w-5 text-sky-300" />
-          <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">Network intel</h3>
+        <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.1 }} className={`${CARD} col-span-12 md:col-span-4`} data-testid="bento-card-archive">
+          <Archive className="h-5 w-5 text-sky-300" />
+          <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">Script archive</h3>
           <p className="mt-2 font-mono text-xs leading-relaxed text-slate-400">
-            Live read on your own link — medium, effective speed, latency — plus a straight answer
-            on what browsers can and cannot see on Wi-Fi.
+            Every obfuscation submission is archived for the owner — downloadable as .lua,
+            auto-deleted after 30 days.
           </p>
-          <Metric>Real-time</Metric>
+          <Metric>30-day TTL</Metric>
         </motion.div>
 
         <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.15 }} className={`${CARD} col-span-12 md:col-span-4`} data-testid="bento-card-privacy">
           <Fingerprint className="h-5 w-5 text-sky-300" />
           <h3 className="mt-4 font-heading text-lg font-black uppercase tracking-tight text-slate-100">
-            Zero-upload privacy
+            Zero accounts
           </h3>
           <p className="mt-2 font-mono text-xs leading-relaxed text-slate-400">
-            Pure static site. No backend, no analytics, no account. Every byte of sensor data is
-            processed in your tab and dies with it.
+            No signup anywhere on the site. The only gate is the owner's access code — everything
+            else just works, in the open.
           </p>
-          <Metric>100% local</Metric>
+          <Metric>1 code</Metric>
         </motion.div>
 
         <motion.div {...reveal} transition={{ duration: 0.7, delay: 0.2 }} className={`${CARD} col-span-12`} data-testid="bento-card-github">

@@ -262,7 +262,42 @@ function walkAll(node: unknown, cb: (n: Record<string, unknown>) => void) {
   }
 }
 
-export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1, flatten = false): ObfuscateResult {
+// Junk-code injection: harmless decoy local declarations scattered between top-level
+// statements. Pure noise for a human reader and for flattening (each becomes an extra
+// dispatch block). Insertion points are always statement boundaries — never mid-token,
+// never after a top-level return.
+function injectJunk(source: string, count = 6): string {
+  let ast: any;
+  try {
+    ast = luaparse.parse(source, { ranges: true, locations: false, comments: false });
+  } catch {
+    return source;
+  }
+  const body: any[] = Array.isArray(ast.body) ? ast.body : [];
+  if (body.length === 0) return source;
+  const taken = new Set<string>();
+  walkAll(ast, (n) => {
+    if (n.type === "Identifier" && typeof n.name === "string") taken.add(n.name);
+  });
+  const points = body.map((s: any) => s.range[0] as number);
+  const inserts: Array<{ at: number; text: string }> = [];
+  for (let i = 0; i < count; i++) {
+    let name = "";
+    do {
+      name = `_0x${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`;
+    } while (taken.has(name));
+    taken.add(name);
+    const a = Math.floor(Math.random() * 0xffff);
+    const at = points[Math.floor(Math.random() * points.length)];
+    inserts.push({ at, text: `local ${name} = 0x${a.toString(16)}\n` });
+  }
+  inserts.sort((x, y) => y.at - x.at);
+  let out = source;
+  for (const e of inserts) out = out.slice(0, e.at) + e.text + out.slice(e.at);
+  return out;
+}
+
+export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1, flatten = false, junk = false): ObfuscateResult {
   const deepActive =
     opts.encryptStrings || opts.renameLocals || opts.mutateNumbers || opts.stripComments || flatten;
   if (opts.vault && !deepActive) {
@@ -477,6 +512,7 @@ export function obfuscateLua(source: string, opts: ObfuscateOptions, layers = 1,
   let out = src;
   for (const e of edits) out = out.slice(0, e.start) + e.text + out.slice(e.end);
 
+  if (junk) out = injectJunk(out);
   if (flatten) out = flattenChunkFlow(out);
 
   if (strings > 0) {

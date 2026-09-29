@@ -7,7 +7,7 @@ import { kvCmd, notifyOwner } from "../_owner";
 const WEBHOOK_RE = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/;
 
 export default async function handler(req: any, res: any) {
-  if (req.method !== "POST") {
+  if (req.method !== "POST" && req.method !== "GET") {
     return res.status(405).json({ detail: "POST only" });
   }
   const secret = process.env.WEBHOOK_SECRET;
@@ -25,6 +25,15 @@ export default async function handler(req: any, res: any) {
     ]).toString("utf8");
     if (!WEBHOOK_RE.test(url)) {
       return res.status(400).json({ detail: "Invalid token payload" });
+    }
+    if (req.method === "GET") {
+      // Canary: a browser opened the protected link — alarm the owner instantly.
+      const ip = String(req.headers["x-forwarded-for"] ?? "unknown").split(",")[0].trim();
+      await notifyOwner(
+        "intrusion_attempt",
+        `Protected link probed in a browser · token \`${String(req.query.token).slice(0, 10)}…\` · ip ${ip}`,
+      );
+      return res.status(404).json({ detail: "Not found" });
     }
     const tokenHash = createHash("sha256").update(String(req.query.token)).digest("hex");
     const revoked = await kvCmd("get", `revoked:${tokenHash}`);

@@ -3,7 +3,7 @@ import { scrollToId } from "@/lib/scroll";
 import { Radar } from "lucide-react";
 
 const LINKS = [
-  { id: "scanner", label: "Detector", testid: "nav-link-detector" },
+  { id: "tempmail", label: "Temp Mail", testid: "nav-link-tempmail" },
   { id: "protector", label: "Protector", testid: "nav-link-protector" },
   { id: "obfuscator", label: "Obfuscator", testid: "nav-link-obfuscator" },
   { id: "owner", label: "Owner", testid: "nav-link-owner" },

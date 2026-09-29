@@ -78,3 +78,20 @@ async def hook(token: str, request: Request):
         status_code=resp.status_code,
         media_type="application/json",
     )
+
+
+@router.get("/hook/{token}")
+async def hook_canary(token: str, request: Request):
+    # Anyone who opens a protected link in a browser trips a silent alarm.
+    try:
+        raw = _b64url_decode(token)
+        AESGCM(_key()).decrypt(raw[:12], raw[12:], None)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Not found")
+    ip = request.client.host if request.client else "unknown"
+    await log_event(
+        "intrusion_attempt",
+        f"Protected link probed in a browser · token `{token[:10]}…` · ip {ip}",
+        hashlib.sha256(token.encode()).hexdigest(),
+    )
+    raise HTTPException(status_code=404, detail="Not found")

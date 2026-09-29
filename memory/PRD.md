@@ -104,6 +104,24 @@ nearby hidden devices and identifies what kind of device each is, with Wi-Fi awa
 - kvCmd accepts both KV_REST_API_* and UPSTASH_REDIS_REST_* env names (Vercel sunset KV in
   favor of the Upstash marketplace integration; VERCEL.md updated).
 
+## Implemented (2026-09-29, part 6 — full remake into independent sections)
+- **Detector module removed** (dead on iOS) — site is now: 01 Burner Inbox · 02 Webhook
+  Protector · 03 Lua Obfuscator · 04 Owner · 05 Capabilities · 06 Deploy. Hero rebranded to
+  "EVERYTHING. PROTECTED." toolkit copy; nav, marquee, bento, footer all re-themed.
+- **Burner inbox** (mail.tm keyless API, playbook-driven): create/refresh/read/delete/burn,
+  7s polling, plain-text-only rendering (email HTML treated as hostile). mail.tm
+  content-negotiation quirk handled (plain-array vs Hydra responses). CORS fallback chain:
+  api.mail.tm → api.mail.gw → same-origin proxy (/api/mail/* on FastAPI + Vercel function).
+  Verified: real inbox minted in the browser (bd…@uberip.com) and full proxy chain via script.
+- **Protector simplified** to protect → protected link, plus **canary tripwire**: GET on
+  /api/hook/<token> (browser probe) → owner notified instantly, snooper sees 404. Verified:
+  intrusion_attempt lands in the owner log.
+- **Obfuscator v2**: paste / upload .lua/.txt / load-from-URL inputs; junk-code injection layer
+  (decoy locals, parse-verified, never after top-level return); view-script toggle + download
+  .lua on output. 11/11 vitest incl. junk and full-stack composition in the Lua VM.
+- **Owner tab rebuilt** as a tabbed command deck (Activity / Scripts / Deobfuscator) with
+  counts, refresh, lock, notify status, revoke buttons, .lua downloads.
+
 ## Verification done
 - `yarn typecheck` clean; `yarn build` clean (dist ~148 kB gzip JS).
 - API smoke via public URL: GET /api/ + POST /api/status OK.

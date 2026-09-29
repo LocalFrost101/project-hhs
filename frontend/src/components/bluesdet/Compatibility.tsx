@@ -1,11 +1,12 @@
 import { motion } from "motion/react";
 import { AlertTriangle, CheckCircle2, Terminal, XCircle } from "lucide-react";
 
-const SUPPORT = [
-  { browser: "Chrome / Edge (desktop)", ble: "Device picker · radar via flag", emf: false, note: "Enable chrome://flags/#enable-experimental-web-platform-features for the continuous radar." },
-  { browser: "Chrome (Android)", ble: "Full radar + picker", emf: true, note: "Best experience — every module live." },
-  { browser: "Safari (iOS / macOS)", ble: "Not exposed", emf: false, note: "Apple does not ship Web Bluetooth; network + inventory panels still work." },
-  { browser: "Firefox", ble: "Not exposed", emf: false, note: "No Web Bluetooth; other modules function." },
+const MODULES = [
+  { name: "Burner inbox", statik: true, note: "Talks to the disposable-mail API straight from your tab — works on every host, Pages included." },
+  { name: "Lua obfuscator", statik: true, note: "Pure in-browser engine — strings, renaming, junk, flattening, vault." },
+  { name: "Webhook protector", statik: false, note: "Needs the serverless functions (Vercel) or the FastAPI backend to hold the encryption secret." },
+  { name: "Canary tripwire + owner notify", statik: false, note: "Server-side: link probes and relays alarm the owner's Discord webhook." },
+  { name: "Owner tab · logs · archive · revoke", statik: false, note: "Server auth; Vercel KV powers lockout, revocation, and the 30-day script archive." },
 ];
 
 const DEPLOY_STEPS = [
@@ -46,23 +47,25 @@ export function Compatibility() {
               <table className="w-full border-collapse font-mono text-xs" data-testid="compatibility-table">
                 <thead>
                   <tr className="bg-sky-400/5 text-left">
-                    <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>Browser</th>
-                    <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>BLE radar</th>
-                    <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>EMF</th>
+                    <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>Module</th>
+                    <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>Static (Pages)</th>
+                    <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>Vercel</th>
                     <th className={`${cell} text-[10px] uppercase tracking-[0.2em] text-slate-400`}>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {SUPPORT.map((row) => (
-                    <tr key={row.browser} className="transition-colors hover:bg-sky-400/5">
-                      <td className={`${cell} font-bold text-slate-200`}>{row.browser}</td>
-                      <td className={`${cell} text-slate-400`}>{row.ble}</td>
+                  {MODULES.map((row) => (
+                    <tr key={row.name} className="transition-colors hover:bg-sky-400/5">
+                      <td className={`${cell} font-bold text-slate-200`}>{row.name}</td>
                       <td className={cell}>
-                        {row.emf ? (
+                        {row.statik ? (
                           <CheckCircle2 className="h-4 w-4 text-sky-300" />
                         ) : (
                           <XCircle className="h-4 w-4 text-slate-600" />
                         )}
+                      </td>
+                      <td className={cell}>
+                        <CheckCircle2 className="h-4 w-4 text-sky-300" />
                       </td>
                       <td className={`${cell} leading-relaxed text-slate-500`}>{row.note}</td>
                     </tr>
@@ -74,11 +77,11 @@ export function Compatibility() {
             <div className="mt-5 flex gap-3 rounded-md border border-amber-400/25 bg-amber-400/5 p-5" data-testid="reality-check-note">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
               <p className="font-mono text-xs leading-relaxed text-slate-400">
-                Straight talk: no website — this one included — can scan Wi-Fi networks or enumerate
-                devices on your LAN. Browsers forbid it by design. Blues DET detects what the web
-                platform genuinely exposes: every BLE transmitter in radio range, magnetic
-                anomalies from hidden electronics, and your own connection and sensors. That's the
-                real ceiling, and Blues DET hits all of it.
+                Straight talk: a static host (GitHub Pages) can't keep secrets or remember
+                anything — no encryption keys, no owner sessions, no logs. That's physics, not a
+                bug. Pages serves the inbox and obfuscator perfectly; anything that protects or
+                records needs the Vercel functions. The site detects which one it's on and tells
+                you at the top of each server module.
               </p>
             </div>
           </motion.div>

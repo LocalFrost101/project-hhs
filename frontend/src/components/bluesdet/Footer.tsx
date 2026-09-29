@@ -38,7 +38,7 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-sky-400/10 pt-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-slate-600">
-            © {new Date().getFullYear()} Blues DET — static build, zero backend
+            © {new Date().getFullYear()} Blues DET — burner mail · hook armor · lua vault
           </p>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-slate-600">
             Deploy anywhere · GitHub Pages ready
